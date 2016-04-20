@@ -6,6 +6,8 @@
 
 (defun setup ()
   (setf *walkers* '())
+  (setf horiz-probability-set (list -1 0 1))
+  (setf vert-probability-set (list -1 0 1))
   (dotimes (i 5)
     (setf *walkers* (cons (walker) *walkers*))))
 

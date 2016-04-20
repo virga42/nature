@@ -47,10 +47,10 @@
 				  (on-mouse-down fn x y)
 				  (setf *mouse-x* x)
 				  (setf *mouse-y* y)))
-      (:mouse-button-up-event (:x x :y y)
-			      (update-walk-probability (mouse-direction (list (- x *mouse-x*) (- y *mouse-y*))))) 
+      ;; (:mouse-button-up-event (:x x :y y)
+      ;; 			      (update-walk-probability (mouse-direction (list (- x *mouse-x*) (- y *mouse-y*))))) 
       (:idle ()
-	     (draw)
+	     (draw)	     
 	     (update-display)
 	     (process-events)))))
 
