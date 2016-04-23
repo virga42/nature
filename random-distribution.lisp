@@ -1,5 +1,8 @@
 (load "~/bottega/nature/nature-sdl.lisp")
 
+;; Demonstrate random distribution
+;; Uniform and Gaussian (Normal)
+
 (in-package :nature)
 
 (defparameter *size* 10)
@@ -11,49 +14,22 @@
   (setf *counter* 0))  
 
 (defun draw (&optional (n 5))
-  (when (< *counter* 1000)
+  (when (< *counter* 200)
     (dotimes (i n)
-      (incf (elt *random-set* (random-number-generator))))
-      ;; (print *random-set*)
+      (incf (elt *random-set* (floor (random-number-generator))))
       (clear-display *black*)
       (render-bars *random-set*))
-    (setf *counter* (1+ *counter*)))
+    (incf *counter*)))
+
+;; (defun random-number-generator ()
+;;   (random 10))
 
 (defun random-number-generator ()
-  (random *size*))
-
-;;; update-nth loop-style
-;; (defun update-nth (n list)
-;;   (loop for i from 0 for j in list collect (if (= i n) (1+ j) j)))
-
-;;; update-nth recursive-style
-;; (defun update-nth (n list)
-;;   (if (> n 0)
-;;       (cons (car list) (update-nth (1- n) (cdr list)))
-;;       (cons (1+ (car list)) (cdr list))))
+  (+ 5 (* 5 (random-gauss))))
 
 (defun render-bars (set)
-  (let* ((width (/ *window-width* *size*))
+  (let* ((width (floor (/ *window-width* *size*)))
 	 (random-set-list (coerce *random-set* 'list)))
   (loop for i from 0 for j in random-set-list do
        (draw-rectangle-* (* i width) (- *window-height* j) width j :color *blue*))))
 
-(defun standard-deviation (list)
-  (let* ((n (length list))
-	 mean)
-    (cond
-      ((= n 0) nil)
-      ((= n 1) 0)
-      (t (progn
-	   (setf mean (/ (reduce #'+ list) n))
-	   (sqrt (/ (reduce #'+
-			    (mapcar #'(lambda (x) (expt (- x mean) 2))
-				    list))
-		    n)))))))
-
-;; Generate 12 numbers from 0->1
-;; Sum them
-;; Subtract 6
-
-(defun random-gauss ()
-  )
