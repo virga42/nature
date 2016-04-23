@@ -21,19 +21,21 @@
   (let* ((xmean (/ *window-width* 2))
 	 (ymean (/ *window-height* 2))
 	 (rgbmean (/ 255 2))
-	 (sdx 100)
-	 (sdy 100)
+	 (sdx 400)
+	 (sdy 400)
 	 (sdr 75)
 	 (sdg 75)
 	 (sdb 75)
+	 (sdradius 30)
 	 (xloc (floor (+ (* (random-gauss) sdx) xmean)))
 	 (yloc (floor (+ (* (random-gauss) sdy) ymean)))
 	 (r (+ (* (random-gauss) sdr) rgbmean))
 	 (g (+ (* (random-gauss) sdg) rgbmean))
-	 (b (+ (* (random-gauss) sdb) rgbmean)))
-    (draw-filled-circle-* xloc yloc 2
+	 (b (+ (* (random-gauss) sdb) rgbmean))
+	 (radius (floor (+ (* (random-gauss) sdradius) 10))))
+    (draw-filled-circle-* xloc yloc radius
 			  :color (sdl:color :r r :g g :b b)
-			  :alpha 100)))
+			  )))
 
 
 
