@@ -57,3 +57,16 @@
 (defun on-mouse-down (fn x y)
   (funcall fn (format nil "X: ~a Y: ~a Rel: ~a" x y (sdl:mouse-relative-position))))  
 
+(defun standard-deviation (list)
+  (let* ((n (length list))
+	 mean)
+    (cond
+      ((= n 0) nil)
+      ((= n 1) 0)
+      (t (progn
+	   (setf mean (/ (reduce #'+ list) n))
+	   (sqrt (/ (reduce #'+
+			    (mapcar #'(lambda (x) (expt (- x mean) 2))
+				    list))
+		    n)))))))
+
