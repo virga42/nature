@@ -19,7 +19,7 @@
 	   (start-button (make-instance 'button :master panel-frame :text "Start"))
 	   (reset-button (make-instance 'button :master panel-frame :text "Reset"))
 	   (label (make-instance 'label :master panel-frame))
-	   (item-count-entry (make-instance 'entry :master panel-frame))
+	   (item-count-entry (make-instance 'entry :master panel-frame :text "3"))
 	   (canvas (make-instance 'canvas :master canvas-frame :width 650 :height 600))
 	   (label-fn (lambda (evt) (update-label label evt))))
       (setf (command start-button) (lambda () (draw label item-count-entry canvas)))
@@ -33,15 +33,94 @@
       (pack canvas :side :right)
       (process-events))))
 
-(defun draw (label text canv)
-  (setf (text label) (text text))
-  (setf (text text) "")
-  (draw-arrow 100 100 canv))
+(defun draw (label entry canv)
+  (let ((bird-count (parse-integer (text entry)))
+	(birds '())) 
+    (setf (text label) (text entry))
+    (setf (text entry) "")
+    (dotimes (n bird-count)
+      (push (bird (random 650) (random 600) (random 360) 25) birds))
+    (dotimes (n 100)
+      (setf birds 
+	    (loop for bird in birds
+	       do
+		 (draw-bird bird canv)
+	       collect
+		 (update-position bird (fly bird))))
+      (sleep .1)
+      (setup canv))))
 
-(defun draw-arrow (x y canv)
-  (create-line canv (list 100 100 120 120))
-  (create-line canv (list 120 110 120 120))
-  (create-line canv (list 110 120 120 120)))
+(defun bird (x y angle speed)
+  (list x y angle speed))
+
+(defun bird-* (&key (x 0) (y 0) (angle 0) (speed 0))
+  (bird x y angle speed))
+
+(defun draw-bird (bird canvas)
+  (draw-arrow (x-coord (bird-coord bird))
+	      (y-coord (bird-coord bird))
+	      (bird-speed bird)
+	      (bird-heading bird)
+	      canvas))	       
+
+(defun clone-bird (bird &key (x nil) (y nil) (angle nil) (speed nil))
+  (let ((x (?? x (x-coord (bird-coord bird))))
+	(y (?? y (y-coord (bird-coord bird))))
+	(angle (?? angle (bird-heading bird)))
+	(speed (?? spped (bird-speed bird))))))
+
+(defmacro ?? (exp1 exp2)
+  (let ((exp1-value exp1))
+    `(if ,exp1-value ,exp1-value ,exp2)))
+				  
+(defun bird-coord (bird)
+  (list (first bird) (second bird)))
+
+(defun bird-heading (bird)
+  (third bird))
+
+(defun bird-speed (bird)
+  (fourth bird))
+
+(defun fly (bird)
+  (vector-addition (bird-coord bird) (bird-speed bird) (bird-heading bird)))
+
+(defun update-position (bird coord)
+  (bird (x-coord coord) (y-coord coord) (bird-heading bird) (bird-speed bird)))
+
+(defun turn-bird (bird angle)
+  (clone-bird bird :angle angle))
+
+(defun draw-arrow (x y magnitude angle canv)
+  (labels ((draw-line (x y magnitude angle)
+	     (let ((x0 x)
+		   (y0 y)
+		   (x1 (x-coord (vector-addition (list x y) magnitude angle)))
+		   (y1 (y-coord (vector-addition (list x y) magnitude angle))))
+	       (create-line canv (list x0 y0 x1 y1))
+	       (list x1 y1))))
+    (let ((point (draw-line x y magnitude angle)))
+      (draw-line (x-coord point) (y-coord point) 10 (+ angle 150))
+      (draw-line (x-coord point) (y-coord point) 10 (- angle 150)))))
+
+(defun rad (degrees)
+  (* pi (/ degrees 180.0)))
+
+(defun x-coord (point)
+  (first point))
+
+(defun y-coord (point)
+  (second point))
+
+(defun vector->cartesian (magnitude angle)
+  (let ((x (* (cos (rad angle)) magnitude))
+	(y (* (sin (rad angle)) magnitude)))
+    (list x y)))
+
+(defun vector-addition (coord magnitude angle)
+  (let ((x1 (+ (x-coord coord) (x-coord (vector->cartesian magnitude angle))))
+	(y1 (+ (y-coord coord) (y-coord (vector->cartesian magnitude angle)))))
+    (list x1 y1)))
 
 (defun setup (canvas)
   (clear canvas))
