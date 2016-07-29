@@ -8,6 +8,8 @@
 
 (defparameter *window-width* 800)
 (defparameter *window-height* 600)
+(defparameter *canvas-width* 650)
+(defparameter *canvas-height* 600)
 
 (defun setup ())
 (defun draw ())
@@ -20,7 +22,10 @@
 	   (reset-button (make-instance 'button :master panel-frame :text "Reset"))
 	   (label (make-instance 'label :master panel-frame))
 	   (item-count-entry (make-instance 'entry :master panel-frame :text "3"))
-	   (canvas (make-instance 'canvas :master canvas-frame :width 650 :height 600))
+	   (canvas (make-instance 'canvas
+				  :master canvas-frame
+				  :width *canvas-width*
+				  :height *canvas-height*))
 	   (label-fn (lambda (evt) (update-label label evt))))
       (setf (command start-button) (lambda () (draw label item-count-entry canvas)))
       (setf (command reset-button) (lambda () (setup canvas)))
@@ -83,7 +88,7 @@
   (fourth bird))
 
 (defun fly (bird)
-  (vector-addition (bird-coord bird) (bird-speed bird) (bird-heading bird)))
+  (reconcile (vector-addition (bird-coord bird) (bird-speed bird) (bird-heading bird))))
 
 (defun update-position (bird coord)
   (bird (x-coord coord) (y-coord coord) (bird-heading bird) (bird-speed bird)))
@@ -120,6 +125,15 @@
 (defun vector-addition (coord magnitude angle)
   (let ((x1 (+ (x-coord coord) (x-coord (vector->cartesian magnitude angle))))
 	(y1 (+ (y-coord coord) (y-coord (vector->cartesian magnitude angle)))))
+    (list x1 y1)))
+
+(defun reconcile (coord)
+  (let ((x1 (x-coord coord))
+	(y1 (y-coord coord)))
+    (if (< x1 0) (setf x1 (+ x1 *canvas-width*)))
+    (if (> x1 *canvas-width*) (setf x1 (- *canvas-width* x1)))
+    (if (< y1 0) (setf y1 (+ y1 *canvas-height*)))
+    (if (> y1 *canvas-height*) (setf y1 (- *canvas-height* y1)))
     (list x1 y1)))
 
 (defun setup (canvas)
