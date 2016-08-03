@@ -118,23 +118,21 @@
   (second point))
 
 (defun vector->cartesian (magnitude angle)
-  (let ((x (* (cos (rad angle)) magnitude))
-	(y (* (sin (rad angle)) magnitude)))
-    (list x y)))
+  (list (* (cos (rad angle)) magnitude)
+	(* (sin (rad angle)) magnitude)))
 
 (defun vector-addition (coord magnitude angle)
-  (let ((x1 (+ (x-coord coord) (x-coord (vector->cartesian magnitude angle))))
-	(y1 (+ (y-coord coord) (y-coord (vector->cartesian magnitude angle)))))
-    (list x1 y1)))
+  (list (+ (x-coord coord) (x-coord (vector->cartesian magnitude angle)))
+	(+ (y-coord coord) (y-coord (vector->cartesian magnitude angle)))))
 
 (defun in-between (min max n)
   (cond ((< n min) (- max n))
 	((> n max) (- n max))
 	(t n)))
 
- (defun reconcile (coord)
-   (list (in-between 0 *canvas-width* (x-coord coord))
-	 (in-between 0 *canvas-height* (y-coord coord))))
-    
+(defun reconcile (coord)
+  (list (in-between 0 *canvas-width* (x-coord coord))
+	(in-between 0 *canvas-height* (y-coord coord))))
+
 (defun setup (canvas)
   (clear canvas))
